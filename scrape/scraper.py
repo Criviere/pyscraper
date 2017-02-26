@@ -8,17 +8,15 @@ class TestFIUSearchPage():
 	def __init__(self):
 		self.driver = webdriver.Firefox()
 		self.driver.get("https://pslinks.fiu.edu/psc/cslinks/EMPLOYEE/CAMP/c/COMMUNITY_ACCESS.CLASS_SEARCH.GBL&FolderPath=PORTAL_ROOT_OBJECT.HC_CLASS_SEARCH_GBL&IsFolder=false&IgnoreParamTempl=FolderPath,IsFolder")
-		os.remove('data.json')
 
 	def search_request(self, num, pre):
-
 		courseNumber = self.driver.find_element_by_id('SSR_CLSRCH_WRK_CATALOG_NBR$4')
 		courseNumber.send_keys(num)
 		prefix = self.driver.find_element_by_id('SSR_CLSRCH_WRK_SUBJECT$3')
 		prefix.send_keys(pre)
 		self.driver.find_element_by_id('CLASS_SRCH_WRK2_SSR_PB_CLASS_SRCH').click()
 
-	def scrape_courses(self):
+	def getCourses(self):
 		courses = []
 		course = {}
 		classSectionsFound = self.driver.find_element_by_xpath('//*[@id="win0divSSR_CLSRSLT_WRK_GROUPBOX1"]/table/tbody/tr[1]/td').text
@@ -34,13 +32,17 @@ class TestFIUSearchPage():
 			course['meetingDates'] = self.driver.find_element_by_xpath('//*[@id="MTG_TOPIC$' + str(i) + '"]').text
 			course['location'] = self.driver.find_element_by_xpath('//*[@id="DERIVED_CLSRCH_DESCR$' + str(i) + '"]').text
 			courses.append(course)
-			course = {}
 			i = i + 1
+			course = {}
 		return courses
 
+	def removeExistingFile(self):
+		if os.path.exists('data.json'):
+			os.remove('data.json')
+
 	def writeJson(self):
-		with open('data.json', 'a') as outfile:
-			json.dump(self.scrape_courses(), outfile, sort_keys=True, indent=4)
+		with open('data.json', 'a+') as outfile:
+			json.dump(self.getCourses(), outfile, sort_keys=True, indent=4)
 
 	def modifySearch(self):
 			self.driver.find_element_by_id('CLASS_SRCH_WRK2_SSR_PB_MODIFY').click()
@@ -52,7 +54,6 @@ class TestFIUSearchPage():
 		if(len(self.driver.find_elements_by_id('DERIVED_CLSMSG_ERROR_TEXT')) > 0):
 			return True
 
-	#Early attempt at cleaning up main. combining previously defined functions.
 	def clearAndSearch(self, num, pre):
 			sleep(1)
 			self.clearSearch()
@@ -60,9 +61,9 @@ class TestFIUSearchPage():
 			self.search_request(num, pre)
 			sleep(1)
 
-	#Early attempt at cleaning up main. combining previously defined functions.
 	def scrapeWriteAndModifySearch(self):
-			self.scrape_courses()
+			self.getCourses()
+			sleep(1)
 			self.writeJson()
 			self.modifySearch()
 			sleep(1)
@@ -86,6 +87,7 @@ class TestFIUSearchPage():
 
 		while(i < len(courseNumList)):
 			self.clearAndSearch(courseNumList[i], coursePrefixList[i])
+
 
 			if(self.checkSearch() == True):
 				i = i + 1
