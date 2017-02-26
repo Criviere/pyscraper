@@ -16,8 +16,7 @@ class TestFIUSearchPage():
 		prefix.send_keys(pre)
 		self.driver.find_element_by_id('CLASS_SRCH_WRK2_SSR_PB_CLASS_SRCH').click()
 
-	def getCourses(self):
-		courses = []
+	def getCourses(self, courses):
 		course = {}
 		classSectionsFound = self.driver.find_element_by_xpath('//*[@id="win0divSSR_CLSRSLT_WRK_GROUPBOX1"]/table/tbody/tr[1]/td').text
 		n = int(classSectionsFound.partition(' ')[0])
@@ -36,13 +35,9 @@ class TestFIUSearchPage():
 			course = {}
 		return courses
 
-	def removeExistingFile(self):
-		if os.path.exists('data.json'):
-			os.remove('data.json')
-
-	def writeJson(self):
-		with open('data.json', 'a+') as outfile:
-			json.dump(self.getCourses(), outfile, sort_keys=True, indent=4)
+	def writeJson(self, courses):
+		with open('data.json', 'w') as outfile:
+			json.dump(courses, outfile, sort_keys=True, indent=4)
 
 	def modifySearch(self):
 			self.driver.find_element_by_id('CLASS_SRCH_WRK2_SSR_PB_MODIFY').click()
@@ -61,10 +56,10 @@ class TestFIUSearchPage():
 			self.search_request(num, pre)
 			sleep(1)
 
-	def scrapeWriteAndModifySearch(self):
-			self.getCourses()
+	def scrapeAndModifySearch(self, courses):
 			sleep(1)
-			self.writeJson()
+			self.getCourses(courses)
+			sleep(1)
 			self.modifySearch()
 			sleep(1)
 
@@ -84,17 +79,19 @@ class TestFIUSearchPage():
 		i = 0
 		courseNumList = self.writeToCourseNumList()
 		coursePrefixList = self.writeToCoursePrefixList()
+		courses = []
 
 		while(i < len(courseNumList)):
 			self.clearAndSearch(courseNumList[i], coursePrefixList[i])
-
 
 			if(self.checkSearch() == True):
 				i = i + 1
 				continue
 
-			self.scrapeWriteAndModifySearch()
+			self.scrapeAndModifySearch(courses)
 			i = i + 1
 
 			if(i == len(courseNumList)):
 				break
+
+		self.writeJson(courses)

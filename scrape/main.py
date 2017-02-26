@@ -4,7 +4,7 @@ def main():
 
     classObject = scraper.TestFIUSearchPage()
 
-    removeExistingFile = classObject.removeExistingFile()
+    # removeExistingFile = classObject.removeExistingFile()
 
     scrape = classObject.scrape()
 
