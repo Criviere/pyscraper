@@ -4,9 +4,9 @@ import json
 import os
 
 class TestFIUSearchPage():
-
+	
 	def __init__(self):
-		self.driver = webdriver.Firefox()
+		self.driver = webdriver.PhantomJS()
 		self.driver.get("https://pslinks.fiu.edu/psc/cslinks/EMPLOYEE/CAMP/c/COMMUNITY_ACCESS.CLASS_SEARCH.GBL&FolderPath=PORTAL_ROOT_OBJECT.HC_CLASS_SEARCH_GBL&IsFolder=false&IgnoreParamTempl=FolderPath,IsFolder")
 
 	def search_request(self, num, pre):
@@ -19,6 +19,7 @@ class TestFIUSearchPage():
 	def getCourses(self, courses):
 		course = {}
 		classSectionsFound = self.driver.find_element_by_xpath('//*[@id="win0divSSR_CLSRSLT_WRK_GROUPBOX1"]/table/tbody/tr[1]/td').text
+		self.driver.implicitly_wait(1) #PhantomJS could not find element. Added to allow headless browser time to acquire.
 		n = int(classSectionsFound.partition(' ')[0])
 		i = 0
 		while(i < n):
