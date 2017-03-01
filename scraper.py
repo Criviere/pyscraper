@@ -15,8 +15,9 @@ class TestFIUSearchPage():
 		prefix = self.driver.find_element_by_id('SSR_CLSRCH_WRK_SUBJECT$3')
 		prefix.send_keys(pre)
 		self.driver.find_element_by_id('CLASS_SRCH_WRK2_SSR_PB_CLASS_SRCH').click()
+	
 
-	def getCourses(self, courses):
+	def getCourses(self):
 		course = {}
 		classSectionsFound = self.driver.find_element_by_xpath('//*[@id="win0divSSR_CLSRSLT_WRK_GROUPBOX1"]/table/tbody/tr[1]/td').text
 		self.driver.implicitly_wait(1) #PhantomJS could not find element. Added to allow headless browser time to acquire.
@@ -40,14 +41,16 @@ class TestFIUSearchPage():
 			locationinfo = self.driver.find_element_by_xpath('//*[@id="DERIVED_CLSRCH_DESCR$' + str(i) + '"]').text
 			course['location'] = locationinfo.replace('\n','')
 			
-			courses.append(course)
+			self.writeJson(course) #calling method with each course object
+			#courses.append(course) removed appending to list
 			i = i + 1
-			course = {}
-		return courses
+			course = {}	
+		#return 
 
-	def writeJson(self, courses):
-		with open('data.json', 'w') as outfile:
-			json.dump(courses, outfile, sort_keys=True, indent=4)
+	#No longer passing list as parameter. Pass individual course object. Appending to file in this location, instead of appending to list.
+	def writeJson(self, aCourse):
+		with open('data.json', 'a') as outfile:
+			json.dump(aCourse, outfile, sort_keys=True, indent=4)
 
 	def modifySearch(self):
 			self.driver.find_element_by_id('CLASS_SRCH_WRK2_SSR_PB_MODIFY').click()
@@ -66,9 +69,11 @@ class TestFIUSearchPage():
 			self.search_request(num, pre)
 			sleep(1)
 
-	def scrapeAndModifySearch(self, courses):
+	#def scrapeAndModifySearch(self, courses):
+        def scrapeAndModifySearch(self):
 			sleep(1)
-			self.getCourses(courses)
+			#self.getCourses(courses) removed parameter passed to method
+			self.getCourses()
 			sleep(1)
 			self.modifySearch()
 			sleep(1)
@@ -89,7 +94,7 @@ class TestFIUSearchPage():
 		i = 0
 		courseNumList = self.writeToCourseNumList()
 		coursePrefixList = self.writeToCoursePrefixList()
-		courses = []
+		open('data.json','w').close()#Erase json at start of script. 		
 
 		while(i < len(courseNumList)):
 			self.clearAndSearch(courseNumList[i], coursePrefixList[i])
@@ -98,10 +103,11 @@ class TestFIUSearchPage():
 				i = i + 1
 				continue
 
-			self.scrapeAndModifySearch(courses)
+			#self.scrapeAndModifySearch(courses) removed passing list parameter
+			self.scrapeAndModifySearch()
 			i = i + 1
 
 			if(i == len(courseNumList)):
 				break
-		self.writeJson(courses)
+		#self.writeJson(courses) removed write to list
 
