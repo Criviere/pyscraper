@@ -1,7 +1,9 @@
+from elasticsearch import Elasticsearch
 from selenium import webdriver
 from time import sleep
 import json
 import os
+es = Elasticsearch()
 
 class TestFIUSearchPage():
 
@@ -34,6 +36,7 @@ class TestFIUSearchPage():
 			i = i + 1
 			course = {}
 		return courses
+
 
 	def writeJson(self, courses):
 		with open('data.json', 'w') as outfile:
@@ -80,7 +83,7 @@ class TestFIUSearchPage():
 		courseNumList = self.writeToCourseNumList()
 		coursePrefixList = self.writeToCoursePrefixList()
 		courses = []
-
+        
 		while(i < len(courseNumList)):
 			self.clearAndSearch(courseNumList[i], coursePrefixList[i])
 
@@ -93,5 +96,8 @@ class TestFIUSearchPage():
 
 			if(i == len(courseNumList)):
 				break
+    
+		for values in courses:   #write the courses into the cs index using elasticsearch index function
+                        es.index(index="cs", doc_type='course',  body=values)
 
-		self.writeJson(courses)
+                        
