@@ -22,14 +22,23 @@ class TestFIUSearchPage():
 		n = int(classSectionsFound.partition(' ')[0])
 		i = 0
 		while(i < n):
-			course['courseInfo'] = self.driver.find_element_by_xpath('//*[@id="win0divSSR_CLSRSLT_WRK_GROUPBOX2GP$0"]').text
-			course['classNum'] = self.driver.find_element_by_xpath('//*[@id="MTG_CLASS_NBR$' + str(i) + '"]').text
-			course['section'] = self.driver.find_element_by_xpath('//*[@id="MTG_CLASSNAME$' + str(i) + '"]').text
-			course['daysAndTimes'] = self.driver.find_element_by_xpath('//*[@id="MTG_DAYTIME$' + str(i) + '"]').text
-			course['room'] = self.driver.find_element_by_xpath('//*[@id="MTG_ROOM$' + str(i) + '"]').text
-			course['instructor'] = self.driver.find_element_by_xpath('//*[@id="MTG_INSTR$' + str(i) + '"]').text
-			course['meetingDates'] = self.driver.find_element_by_xpath('//*[@id="MTG_TOPIC$' + str(i) + '"]').text
-			course['location'] = self.driver.find_element_by_xpath('//*[@id="DERIVED_CLSRCH_DESCR$' + str(i) + '"]').text
+			outinfo = self.driver.find_element_by_xpath('//*[@id="win0divSSR_CLSRSLT_WRK_GROUPBOX2GP$0"]').text
+			course['courseinfo'] = outinfo.replace('\n','')
+			classnuminfo = self.driver.find_element_by_xpath('//*[@id="MTG_CLASS_NBR$' + str(i) + '"]').text
+			course['classNum'] = classnuminfo.replace('\n','')
+			outsection = self.driver.find_element_by_xpath('//*[@id="MTG_CLASSNAME$' + str(i) + '"]').text
+			course['section'] = outsection.replace('\n','')
+			daysandtimesinfo = self.driver.find_element_by_xpath('//*[@id="MTG_DAYTIME$' + str(i) + '"]').text
+			course['daysAndTimes'] = daysandtimesinfo.replace('\n','')
+			roominfo = self.driver.find_element_by_xpath('//*[@id="MTG_ROOM$' + str(i) + '"]').text
+			course['room'] = roominfo.replace('\n','')
+			instructorinfo = self.driver.find_element_by_xpath('//*[@id="MTG_INSTR$' + str(i) + '"]').text
+			course['instructor'] = instructorinfo.replace('\n','')
+			meetingdatesinfo = self.driver.find_element_by_xpath('//*[@id="MTG_TOPIC$' + str(i) + '"]').text
+			course['meetingDates'] = meetingdatesinfo.replace('\n','')
+			locationinfo = self.driver.find_element_by_xpath('//*[@id="DERIVED_CLSRCH_DESCR$' + str(i) + '"]').text
+			course['location'] = locationinfo.replace('\n','')
+			
 			courses.append(course)
 			i = i + 1
 			course = {}
@@ -93,5 +102,5 @@ class TestFIUSearchPage():
 
 			if(i == len(courseNumList)):
 				break
-
 		self.writeJson(courses)
+
